@@ -9,13 +9,13 @@
         xmlns:converters="clr-namespace:WatchingArchiver.Utils.Converters"
         mc:Ignorable="d"
         Title="Watching Archiver" 
-        Height="500" Width="370">
+        Height="600" Width="800">
     <Grid>
         <Grid.Resources>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition />
+            <ColumnDefinition Width="130" />
             <ColumnDefinition />
             <ColumnDefinition Width="60" />
         </Grid.ColumnDefinitions>
@@ -36,11 +36,32 @@
                Content="Archive directory: " />        
 
         <TextBox Grid.Column="1" Grid.Row="0" 
+                 Text="{Binding WatchPath}"
                  IsEnabled="{Binding Archiving, Converter={StaticResource InverseBooleanConverter}}" />
         <TextBox Grid.Column="1" Grid.Row="1" 
+                 Text="{Binding ArchivePath}"
                  IsEnabled="{Binding Archiving, Converter={StaticResource InverseBooleanConverter}}" />
-        
-        <ListView Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" />
+
+        <Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" Grid.Row="0" 
+                   Content="Processing: " />
+            <Label Grid.Column="1" Grid.Row="0" 
+                   Content="Archived: " />
+
+            <ListView Grid.Column="0" Grid.Row="1"
+                      ItemsSource="{Binding Processing}" />
+            <ListView Grid.Column="1" Grid.Row="1" 
+                      ItemsSource="{Binding Archived}" />
+        </Grid>
 
         <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3"
                 Content="{Binding ActionButtonText}"
