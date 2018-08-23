@@ -105,10 +105,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Archiver\Achiver.cs" />
+    <Compile Include="Archiver\FileArchiver.cs" />
+    <Compile Include="Archiver\IArchiver.cs" />
     <Compile Include="Bootstrap\Bootstrapper.cs" />
     <Content Include="FodyWeavers.xml" />
     <Compile Include="Events\FileCompressed.cs" />
+    <Compile Include="Events\FileDoesNotExist.cs" />
+    <Compile Include="Events\FileMoved.cs" />
     <Compile Include="Events\FileRemoved.cs" />
     <Compile Include="Utils\Converters\InverseBooleanConverter.cs" />
     <Compile Include="Utils\FileUtils.cs" />

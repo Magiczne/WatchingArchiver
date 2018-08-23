@@ -1,14 +1,17 @@
 ﻿using System;
 using System.IO;
-using System.Windows;
 using Caliburn.Micro;
+using WatchingArchiver.Archiver;
 using WatchingArchiver.Events;
+using WatchingArchiver.Utils;
 
 namespace WatchingArchiver.ViewModels
 {
-    internal class MainWindowViewModel : Screen, 
-        IHandle<FileRemoved>,
-        IHandle<FileCompressed>
+    internal class MainWindowViewModel : Screen,
+        IHandle<FileCompressed>,
+        IHandle<FileDoesNotExist>,
+        IHandle<FileMoved>,
+        IHandle<FileRemoved>
     {
         #region Fields
 
@@ -20,7 +23,7 @@ namespace WatchingArchiver.ViewModels
         /// <summary>
         ///     Archiver instance
         /// </summary>
-        private readonly Archiver.Archiver _archiver;
+        private readonly FileArchiver _archiver;
 
         #endregion
 
@@ -64,7 +67,7 @@ namespace WatchingArchiver.ViewModels
         {
             eventAggregator.Subscribe(this);
 
-            _archiver = new Archiver.Archiver(eventAggregator);
+            _archiver = new FileArchiver(eventAggregator);
             _watcher = new FileSystemWatcher();
             _watcher.Created += Archive;
         }
@@ -84,24 +87,39 @@ namespace WatchingArchiver.ViewModels
 
         private void Archive(object sender, FileSystemEventArgs e)
         {
-            Processing.Add(e.Name);
-            _archiver.Archive(e.FullPath);
+            if (FileUtils.IsFile(e.FullPath))
+            {
+                Processing.Add(e.Name);
+                _archiver.Process(e.FullPath);
+            }
         }
 
         #endregion
 
         #region IHandle
 
-        public void Handle(FileRemoved fileRemovedEvent)
+        public void Handle(FileCompressed e)
         {
-            Processing.Remove(fileRemovedEvent.File);
-            Archived.Add($"[ABORTED] {fileRemovedEvent.File}");
+            Processing.Remove(e.File);
+            Archived.Add($"[SUCESS] {e.File}");
         }
 
-        public void Handle(FileCompressed fileCompressedEvent)
+        public void Handle(FileDoesNotExist e)
         {
-            Processing.Remove(fileCompressedEvent.File);
-            Archived.Add($"[SUCESS] {fileCompressedEvent.File}");
+            Processing.Remove(e.File);
+            Archived.Add($"[DOES NOT EXISTS] {e.File}");
+        }
+
+        public void Handle(FileMoved e)
+        {
+            Processing.Remove(e.File);
+            Archived.Add($"[SUCCESS][MOVED] {e.File}");
+        }
+
+        public void Handle(FileRemoved e)
+        {
+            Processing.Remove(e.File);
+            Archived.Add($"[ABORTED] {e.File}");
         }
 
         #endregion

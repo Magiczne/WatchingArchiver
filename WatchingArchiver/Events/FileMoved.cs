@@ -2,9 +2,9 @@
 
 namespace WatchingArchiver.Events
 {
-    internal class FileCompressed
+    internal class FileMoved
     {
-        public FileCompressed(string sourcePath)
+        public FileMoved(string sourcePath)
         {
             SourcePath = sourcePath;
             File = Path.GetFileName(sourcePath);

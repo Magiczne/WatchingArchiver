@@ -2,9 +2,9 @@
 
 namespace WatchingArchiver.Events
 {
-    internal class FileCompressed
+    public class FileDoesNotExist
     {
-        public FileCompressed(string sourcePath)
+        public FileDoesNotExist(string sourcePath)
         {
             SourcePath = sourcePath;
             File = Path.GetFileName(sourcePath);
