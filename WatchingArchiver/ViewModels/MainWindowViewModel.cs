@@ -80,6 +80,7 @@ namespace WatchingArchiver.ViewModels
 
             _logger = new CompositeLogger();
             _logger.Add(this);
+            _logger.Add(new TextLogger());
 
             _archiver = new FileArchiver(eventAggregator);
             _watcher = new FileSystemWatcher();
