@@ -12,6 +12,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Orange.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
 
+                <ResourceDictionary Source="Resources/Styles/DataGrid.xaml" />
                 <ResourceDictionary Source="Resources/Styles/TextBox.xaml" />
 
                 <ResourceDictionary>
@@ -20,6 +21,7 @@
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
 
+            <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource StandardDataGrid}" />
             <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource StandardTextBox}">
                 <Setter Property="MinHeight" Value="25" />
                 <Setter Property="Height" Value="25" />

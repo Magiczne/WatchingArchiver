@@ -55,12 +55,35 @@
             <Label Grid.Column="0" Grid.Row="0" 
                    Content="Processing: " />
             <Label Grid.Column="1" Grid.Row="0" 
-                   Content="Archived: " />
+                   Content="Processed: " />
 
-            <ListView Grid.Column="0" Grid.Row="1"
-                      ItemsSource="{Binding Processing}" />
-            <ListView Grid.Column="1" Grid.Row="1" 
-                      ItemsSource="{Binding Archived}" />
+            <DataGrid Grid.Column="0" Grid.Row="1"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      CanUserReorderColumns="False"
+                      ItemsSource="{Binding Processing}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Status"
+                                        Binding="{Binding FileStatus}" />
+                    <DataGridTextColumn Header="File"
+                                        Binding="{Binding File}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <DataGrid Grid.Column="1" Grid.Row="1"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      CanUserReorderColumns="False"
+                      ItemsSource="{Binding Processed}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Status"
+                                        Binding="{Binding FileStatus}" />
+                    <DataGridTextColumn Header="File"
+                                        Binding="{Binding File}" />
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
 
         <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3"
