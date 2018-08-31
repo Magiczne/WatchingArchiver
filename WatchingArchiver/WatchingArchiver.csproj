@@ -119,6 +119,8 @@
     <Compile Include="Events\FileInUse.cs" />
     <Compile Include="Events\FileMoved.cs" />
     <Compile Include="Events\FileRemoved.cs" />
+    <Compile Include="Logger\CompositeLogger.cs" />
+    <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Models\FileEntry.cs" />
     <Compile Include="Models\FileStatus.cs" />
     <Compile Include="Properties\Strings.Designer.cs">
