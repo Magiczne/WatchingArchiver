@@ -87,7 +87,11 @@ namespace WatchingArchiver.Archiver
         public void Compress(string sourcePath)
         {
             var fileName = Path.GetFileName(sourcePath);
-            var archiveName = $"{DestinationPath}/{DateTime.Now:dd/MM/yyyy HH.mm.ss-fff} - {fileName}.zip";
+            var archivePath = $"{DestinationPath}/{DateTime.Now:yyyy}/{DateTime.Now:MM}";
+            var archiveName =
+                $"{archivePath}/{DateTime.Now:dd/MM/yyyy HH.mm.ss-fff} - {Path.GetFileNameWithoutExtension(sourcePath)}.zip";
+
+            if (!Directory.Exists(archivePath)) Directory.CreateDirectory(archivePath);
 
             using (var zip = ZipFile.Open(archiveName, ZipArchiveMode.Create))
             {
@@ -99,7 +103,10 @@ namespace WatchingArchiver.Archiver
         public void Move(string sourcePath)
         {
             var fileName = Path.GetFileName(sourcePath);
-            var archiveName = $"{DestinationPath}/{DateTime.Now:dd/MM/yyyy HH.mm.ss-fff} - {fileName}.zip";
+            var archivePath = $"{DestinationPath}/{DateTime.Now:yyyy}/{DateTime.Now:MM}";
+            var archiveName = $"{archivePath}/{DateTime.Now:dd/MM/yyyy HH.mm.ss-fff} - {fileName}";
+
+            if (!Directory.Exists(archivePath)) Directory.CreateDirectory(archivePath);
 
             File.Move(sourcePath, archiveName);
         }
