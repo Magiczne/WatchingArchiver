@@ -55,12 +55,17 @@
             <Label Grid.Column="0" Grid.Row="0" 
                    Content="Processing: " />
             <Label Grid.Column="1" Grid.Row="0" 
-                   Content="Archived: " />
+                   Content="Processed: " />
+            
+            <DataGrid Grid.Column="0" Grid.Row="1"
+                      ItemsSource="{Binding Processing}">
 
-            <ListView Grid.Column="0" Grid.Row="1"
-                      ItemsSource="{Binding Processing}" />
-            <ListView Grid.Column="1" Grid.Row="1" 
-                      ItemsSource="{Binding Archived}" />
+            </DataGrid>
+
+            <DataGrid Grid.Column="1" Grid.Row="1"
+                      ItemsSource="{Binding Processed}">
+
+            </DataGrid>
         </Grid>
 
         <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3"

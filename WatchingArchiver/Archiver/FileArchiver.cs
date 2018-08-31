@@ -38,6 +38,7 @@ namespace WatchingArchiver.Archiver
         {
             new Thread(() =>
             {
+                // If file does not exists join thread and finish
                 if (!File.Exists(sourcePath))
                 {
                     _eventAggregator.PublishOnUIThread(new FileDoesNotExist(sourcePath));
@@ -45,10 +46,13 @@ namespace WatchingArchiver.Archiver
                     return;
                 }
 
+                // If file is used by another process wait one second
+                // If file has been removed join thread and finish
                 try
                 {
                     while (FileUtils.IsFileLocked(sourcePath))
                     {
+                        _eventAggregator.PublishOnUIThread(new FileInUse(sourcePath));
                         Thread.Sleep(1000);
                     }
                 }
@@ -60,6 +64,8 @@ namespace WatchingArchiver.Archiver
                     return;
                 }
 
+                // If file is already an archive just move it
+                // In other case compress it
                 if (FileUtils.IsArchived(sourcePath))
                 {
                     Move(sourcePath);
@@ -67,6 +73,7 @@ namespace WatchingArchiver.Archiver
                 }
                 else
                 {
+                    _eventAggregator.PublishOnUIThread(new FileInProgress(sourcePath));
                     Compress(sourcePath);
                     Remove(sourcePath);
                     _eventAggregator.PublishOnUIThread(new FileCompressed(sourcePath));

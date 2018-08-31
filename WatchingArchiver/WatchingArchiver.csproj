@@ -93,6 +93,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Resources\Styles\DataGrid.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\Styles\TextBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -111,8 +115,12 @@
     <Content Include="FodyWeavers.xml" />
     <Compile Include="Events\FileCompressed.cs" />
     <Compile Include="Events\FileDoesNotExist.cs" />
+    <Compile Include="Events\FileInProgress.cs" />
+    <Compile Include="Events\FileInUse.cs" />
     <Compile Include="Events\FileMoved.cs" />
     <Compile Include="Events\FileRemoved.cs" />
+    <Compile Include="Models\FileEntry.cs" />
+    <Compile Include="Models\FileStatus.cs" />
     <Compile Include="Utils\Converters\InverseBooleanConverter.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

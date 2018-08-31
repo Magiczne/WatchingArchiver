@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Caliburn.Micro;
 using WatchingArchiver.Archiver;
 using WatchingArchiver.Events;
+using WatchingArchiver.Models;
 using WatchingArchiver.Utils;
 
 namespace WatchingArchiver.ViewModels
@@ -10,6 +13,8 @@ namespace WatchingArchiver.ViewModels
     internal class MainWindowViewModel : Screen,
         IHandle<FileCompressed>,
         IHandle<FileDoesNotExist>,
+        IHandle<FileInProgress>,
+        IHandle<FileInUse>,
         IHandle<FileMoved>,
         IHandle<FileRemoved>
     {
@@ -32,12 +37,12 @@ namespace WatchingArchiver.ViewModels
         /// <summary>
         ///     Collection of currently processed entries
         /// </summary>
-        public BindableCollection<string> Processing { get; set; } = new BindableCollection<string>();
+        public BindableCollection<FileEntry> Processing { get; set; } = new BindableCollection<FileEntry>();
 
         /// <summary>
         ///     Collection of archived entries
         /// </summary>
-        public BindableCollection<string> Archived { get; set; } = new BindableCollection<string>();
+        public BindableCollection<FileEntry> Processed { get; set; } = new BindableCollection<FileEntry>();
 
         /// <summary>
         ///     Path to the folder that needs to be watched
@@ -89,7 +94,11 @@ namespace WatchingArchiver.ViewModels
         {
             if (FileUtils.IsFile(e.FullPath))
             {
-                Processing.Add(e.Name);
+                Processing.Add(new FileEntry
+                {
+                    File = e.Name
+                });
+
                 _archiver.Process(e.FullPath);
             }
         }
@@ -98,28 +107,54 @@ namespace WatchingArchiver.ViewModels
 
         #region IHandle
 
-        public void Handle(FileCompressed e)
+        public void Handle(FileCompressed evt)
         {
-            Processing.Remove(e.File);
-            Archived.Add($"[SUCESS] {e.File}");
+            var item = Processing.First(entry => entry.File == evt.File);
+            Processing.Remove(item);
+
+            item.FileStatus = FileStatus.Compressed;
+
+            Processed.Add(item);
         }
 
-        public void Handle(FileDoesNotExist e)
+        public void Handle(FileDoesNotExist evt)
         {
-            Processing.Remove(e.File);
-            Archived.Add($"[DOES NOT EXISTS] {e.File}");
+            var item = Processing.First(entry => entry.File == evt.File);
+            Processing.Remove(item);
+
+            item.FileStatus = FileStatus.DoesNotExist;
+
+            Processed.Add(item);
         }
 
-        public void Handle(FileMoved e)
+        public void Handle(FileInProgress evt)
         {
-            Processing.Remove(e.File);
-            Archived.Add($"[SUCCESS][MOVED] {e.File}");
+            Processing.First(entry => entry.File == evt.File).FileStatus = FileStatus.Compressing;
         }
 
-        public void Handle(FileRemoved e)
+        public void Handle(FileInUse evt)
         {
-            Processing.Remove(e.File);
-            Archived.Add($"[ABORTED] {e.File}");
+            Processing.First(entry => entry.File == evt.File).FileStatus = FileStatus.Waiting;
+        }
+
+        public void Handle(FileMoved evt)
+        {
+            var item = Processing.First(entry => entry.File == evt.File);
+            Processing.Remove(item);
+
+            item.FileStatus = FileStatus.Moved;
+
+            Processed.Add(item);
+        }
+
+        public void Handle(FileRemoved evt)
+        {
+            var item = Processing.First(entry => entry.File == evt.File);
+            Processing.Remove(item);
+
+            item.FileStatus = FileStatus.Aborted;
+
+            Processed.Add(item);
         }
 
         #endregion
