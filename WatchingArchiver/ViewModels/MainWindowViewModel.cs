@@ -62,7 +62,7 @@ namespace WatchingArchiver.ViewModels
         /// <summary>
         ///     Text on button
         /// </summary>
-        public string ActionButtonText => Archiving ? "Stop archiving" : "Start archiving";
+        public string ActionButtonText => Archiving ? Properties.Strings.StopMonitoring : Properties.Strings.StartMonitoring;
 
         #endregion
 
