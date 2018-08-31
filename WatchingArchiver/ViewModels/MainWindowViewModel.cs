@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Caliburn.Micro;
 using WatchingArchiver.Archiver;
 using WatchingArchiver.Events;
+using WatchingArchiver.Logger;
 using WatchingArchiver.Models;
 using WatchingArchiver.Utils;
 
@@ -16,7 +16,8 @@ namespace WatchingArchiver.ViewModels
         IHandle<FileInProgress>,
         IHandle<FileInUse>,
         IHandle<FileMoved>,
-        IHandle<FileRemoved>
+        IHandle<FileRemoved>,
+        ILogger
     {
         #region Fields
 
@@ -29,6 +30,11 @@ namespace WatchingArchiver.ViewModels
         ///     Archiver instance
         /// </summary>
         private readonly FileArchiver _archiver;
+
+        /// <summary>
+        ///     Logger instance
+        /// </summary>
+        private readonly CompositeLogger _logger;
 
         #endregion
 
@@ -72,6 +78,10 @@ namespace WatchingArchiver.ViewModels
         {
             eventAggregator.Subscribe(this);
 
+            _logger = new CompositeLogger();
+            _logger.Add(this);
+            _logger.Add(new TextLogger());
+
             _archiver = new FileArchiver(eventAggregator);
             _watcher = new FileSystemWatcher();
             _watcher.Created += Archive;
@@ -107,9 +117,50 @@ namespace WatchingArchiver.ViewModels
 
         #region IHandle
 
-        public void Handle(FileCompressed evt)
+        /// <inheritdoc />
+        public void Handle(FileCompressed e)
         {
-            var item = Processing.First(entry => entry.File == evt.File);
+            _logger.Compressed(e.File);
+        }
+
+        /// <inheritdoc />
+        public void Handle(FileDoesNotExist e)
+        {
+            _logger.DoesNotExists(e.File);
+        }
+
+        /// <inheritdoc />
+        public void Handle(FileInProgress e)
+        {
+            _logger.InProgress(e.File);
+        }
+
+        /// <inheritdoc />
+        public void Handle(FileInUse e)
+        {
+            _logger.InUse(e.File);
+        }
+
+        /// <inheritdoc />
+        public void Handle(FileMoved e)
+        {
+            _logger.Moved(e.File);
+        }
+
+        /// <inheritdoc />
+        public void Handle(FileRemoved e)
+        {
+            _logger.Removed(e.File);
+        }
+
+        #endregion
+
+        #region ILogger
+
+        /// <inheritdoc />
+        public void Compressed(string file)
+        {
+            var item = Processing.First(entry => entry.File == file);
             Processing.Remove(item);
 
             item.FileStatus = FileStatus.Compressed;
@@ -117,9 +168,10 @@ namespace WatchingArchiver.ViewModels
             Processed.Add(item);
         }
 
-        public void Handle(FileDoesNotExist evt)
+        /// <inheritdoc />
+        public void DoesNotExists(string file)
         {
-            var item = Processing.First(entry => entry.File == evt.File);
+            var item = Processing.First(entry => entry.File == file);
             Processing.Remove(item);
 
             item.FileStatus = FileStatus.DoesNotExist;
@@ -127,19 +179,22 @@ namespace WatchingArchiver.ViewModels
             Processed.Add(item);
         }
 
-        public void Handle(FileInProgress evt)
+        /// <inheritdoc />
+        public void InProgress(string file)
         {
-            Processing.First(entry => entry.File == evt.File).FileStatus = FileStatus.Compressing;
+            Processing.First(entry => entry.File == file).FileStatus = FileStatus.Compressing;
         }
 
-        public void Handle(FileInUse evt)
+        /// <inheritdoc />
+        public void InUse(string file)
         {
-            Processing.First(entry => entry.File == evt.File).FileStatus = FileStatus.Waiting;
+            Processing.First(entry => entry.File == file).FileStatus = FileStatus.Waiting;
         }
 
-        public void Handle(FileMoved evt)
+        /// <inheritdoc />
+        public void Moved(string file)
         {
-            var item = Processing.First(entry => entry.File == evt.File);
+            var item = Processing.First(entry => entry.File == file);
             Processing.Remove(item);
 
             item.FileStatus = FileStatus.Moved;
@@ -147,9 +202,10 @@ namespace WatchingArchiver.ViewModels
             Processed.Add(item);
         }
 
-        public void Handle(FileRemoved evt)
+        /// <inheritdoc />
+        public void Removed(string file)
         {
-            var item = Processing.First(entry => entry.File == evt.File);
+            var item = Processing.First(entry => entry.File == file);
             Processing.Remove(item);
 
             item.FileStatus = FileStatus.Aborted;
